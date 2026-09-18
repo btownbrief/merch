@@ -594,7 +594,7 @@
       const idx = () => Math.min(DES.length - 1, Math.max(0, Math.round(ts.scrollTop / ts.clientHeight)));
       let last = -1, timer = null;
       const stop = () => { clearTimeout(timer); timer = null; clearInterval(numTimer); numTimer = null; nums(); };
-      const setBtn = () => { plays.forEach(p => { p.classList.toggle('on', st.tourAuto); p.setAttribute('aria-pressed', String(st.tourAuto)); p.setAttribute('aria-label', st.tourAuto ? 'Pause auto-advance' : 'Auto-advance every 7 seconds'); }); nums(); };
+      const setBtn = () => { plays.forEach(p => { p.classList.toggle('on', st.tourAuto); p.setAttribute('aria-pressed', String(st.tourAuto)); const lb = p.parentElement && p.parentElement.querySelector('.tpause'); if (lb) lb.textContent = st.tourAuto ? 'click to pause' : 'click to play'; p.setAttribute('aria-label', st.tourAuto ? 'Pause auto-advance' : 'Auto-advance every 7 seconds'); }); nums(); };
       const arm = () => { // restart the 7 s clock and the draining ring for the design now on screen
         stop(); if (!st.tourAuto) return;
         if (idx() >= DES.length - 1) { st.tourAuto = false; setBtn(); return; }
