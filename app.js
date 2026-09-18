@@ -154,18 +154,19 @@
     rows.push(row('Product', prods.map(p => {
       const why = avail(d, v, p);
       const pr = p.price == null ? '<small>price to confirm</small>' : (p.key === 'premium' ? `<small>${money(p.price)} · $5 more</small>` : `<small>${money(p.price)}</small>`);
-      const cap = (!why && d.width * 1.3 > (p.max || 12)) ? `<small>up to about ${p.max} in wide here</small>` : '';
+      const cap = '';
       return opt({ pk, k: 'product', val: p.key, on: sel.product === p.key, dis: !!why, label: p.label, extra: why ? `<small>${esc(why)}</small>` : pr + cap, title: why || p.note || '' });
     }).join(''), opts.compact ? 'larger sizes add a few dollars; the total updates as you choose' : ''));
     // placement
     const PL = { Front: 'Front print', Back: 'Back print', Both: 'Both' };
     rows.push(row('Print', prod.places.map(pl => opt({ pk, k: 'place', val: pl, on: sel.place === pl, label: (PL[pl] || pl) + (pl === 'Both' || pl === 'Two sides' ? '*' : '') })).join(''),
-      (prod.places.includes('Both') ? `Front print or back print: the full design, about ${Math.min(Math.round(d.width * 13) / 10, prod.max)} in wide${prod.key === 'zip' ? ' (on the full-zip the front print is the small chest version, beside the zipper)' : ''}. * Both: the full design on the back plus the small chest version on the front, +$${BOTH_UP}.` : (prod.key === 'tote' ? 'One side $22 · two sides $28' : (prod.note || '')))));
+      (prod.places.includes('Both') ? `Front print or back print: the full design, roughly 8 to 10 in wide depending on the product${prod.key === 'zip' ? ' (on the full-zip the front print is the small chest version, beside the zipper)' : ''}. * Both: the full design on the back plus the small chest version on the front, +$${BOTH_UP}.` : (prod.key === 'tote' ? 'One side $22 · two sides $28' : (prod.note || '')))));
     // version: chosen in the carousel above the options (dots + swipe), not repeated here
     // color
     if (colorless(prod)) rows.push(row('Color', `<span class="lad-static">${prod.key === 'sticker' ? 'The sticker follows the art; no garment color.' : 'One color for this product.'}</span>`, ''));
     else rows.push(row('Garment color', suitFor(v, prod).map(c => `<button class="opt sw${sel.color === c ? ' on' : ''}" aria-pressed="${sel.color === c}" style="background:${G[c]}" title="${c}" aria-label="${c}" data-act="pick" data-pk="${pk}" data-k="color" data-v="${c}"></button>`).join(''), (() => { const cs = (window.BTOWN_COLORS || {})[prod.key]; return cs && cs.length ? `${sel.color} shown · at checkout this blank comes in ${cs.length} colors: ${cs.join(', ')}` : `${sel.color} · every color the blank comes in is offered at checkout`; })()));
     // size
+    rows.unshift(rows.pop());   // colour first, so the preview recolours before anything else is chosen (Stephen, 2026-09-19)
     if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''), (sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]} (Printify's larger-size cost)` : 'Standard price') : 'Choose a size')));
     const note = st.note ? `<div class="lad-note ${st.noteKind || 'warn'}">${esc(st.note)}</div>` : '';
     return `<div class="lad">${note}${rows.join('')}</div>`;
@@ -215,6 +216,7 @@
   const printW = (d, p) => Math.min(Math.round(d.width * 13) / 10, p.max || 12);   // prints run 1.3x the intended width, under the product cap
   function viewBlock(pk, cls) {
     const st = S[pk], sel = st.sel, d = byId[sel.id], v = vOf(d, sel.vkey), p = PK[sel.product];
+    st.view = 'art';   // the store shows the close-up only; the on-garment sketch is retired until real Printify photos are imported
     const hex = G[sel.color];
     const wi = printW(d, p);
     const multi = d.variants.length > 1;
@@ -223,15 +225,15 @@
     // the small front print: in a free corner when the main design is wide or tall, in its own strip when it fills the frame
     const fr = d.front; const ar = aspect(v); const room = st.view === 'garment' || ar > 1.45 || ar < 0.8;
     const chip = fr ? `<button class="fchip${room ? '' : ' strip'}" type="button" data-act="lbf" data-pk="${pk}" style="background:${hex}" aria-label="See the front print at full size"><img src="${fr.prev}?r=${REL}" alt="Front print for ${esc(d.name)}"><span>front</span></button>` : '';
-    const strip = fr && !room ? `<div class="pair">${chip}<span class="ptext"><b>Small front print</b> · about 3½ in wide on the left chest when you choose both sides · the main design goes on the back</span></div>` : '';
+    const strip = fr && !room ? `<div class="pair">${chip}<span class="ptext"><b>Small front print</b> · about 3½ in wide on the left chest when you choose both sides · the main design goes on the back · front print only is the full design</span></div>` : '';
     const body = multi ? `<div class="vcar"><div class="vtrack" tabindex="0" data-vcar aria-roledescription="carousel" aria-label="Versions of ${esc(d.name)}. Swipe, drag, or use the arrow keys.">${d.variants.map((vv, i) => `<div class="vslide" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${d.variants.length}: ${esc(vv.label)}">${one(vv)}</div>`).join('')}</div><button class="varr l" data-act="vstep" data-pk="${pk}" data-dir="-1" aria-label="Previous version"${vi === 0 ? ' hidden' : ''}>‹</button><button class="varr r" data-act="vstep" data-pk="${pk}" data-dir="1" aria-label="Next version"${vi === d.variants.length - 1 ? ' hidden' : ''}>›</button>${room ? chip : ''}</div><div class="vdots"><span role="tablist" aria-label="Versions">${d.variants.map((vv, i) => `<button role="tab" class="vdot${i === vi ? ' on' : ''}" aria-selected="${i === vi}" tabindex="${i === vi ? 0 : -1}" data-act="pick" data-pk="${pk}" data-k="vkey" data-v="${vv.key}" aria-label="Version ${i + 1}: ${esc(vv.label)}"></button>`).join('')}</span><span class="vlab" aria-live="polite">${esc(v.label)} · ${vi + 1} of ${d.variants.length}</span></div>` : `<div class="vcar solo">${one(v)}${room ? chip : ''}</div>`;
     const chest = fr && frontHere(p, sel.place);
-    const cap = st.view === 'art' ? `Close-up on ${sel.color} · not to scale`
-      : sel.place === 'Both' ? `${p.label} · front print about 3½ in on the left chest, back print about ${wi} in wide`
+    const cap = st.view === 'art' ? `Shown on ${sel.color} · the shirt colour is a preview; the print itself is exact`
+      : sel.place === 'Both' ? `${p.label} · small front print on the left chest, full design on the back`
       : p.aop ? `${p.label} · the design covers the whole bag`
       : chest ? `${p.label} · ${p.method === 'embroidery' ? 'embroidered ' : ''}front print, about ${['hat', 'beanie'].includes(p.sil) ? 3 : 3.5} in wide`
-      : `${p.label} · ${sel.place === 'Back' ? 'back print' : sel.place.toLowerCase()} · about ${wi} in wide, approximate`;
-    return `<div class="${cls || 'view'}">${body}${strip}<div class="vt"><button class="opt${st.view === 'garment' ? ' on' : ''}" aria-pressed="${st.view === 'garment'}" data-act="view" data-pk="${pk}" data-v="garment"><span>On the ${p.key === 'tote' ? 'tote' : p.key === 'mug' ? 'mug' : p.key === 'hat' ? 'hat' : 'garment'}</span></button><button class="opt${st.view === 'art' ? ' on' : ''}" aria-pressed="${st.view === 'art'}" data-act="view" data-pk="${pk}" data-v="art"><span>Close-up</span></button></div><div class="cap">${esc(cap)}</div></div>`;
+      : `${p.label} · ${sel.place === 'Back' ? 'back print' : sel.place.toLowerCase()}`;
+    return `<div class="${cls || 'view'}">${body}${strip}<div class="cap">${esc(cap)}</div></div>`;
   }
   function pimg(pk) { // square product image used by the Oaklandish-type pages
     const st = S[pk], sel = st.sel, d = byId[sel.id], v = vOf(d, sel.vkey), p = PK[sel.product];
@@ -466,7 +468,7 @@
       const ref = SUNNY[d.id] ? `<p class="ref">A nod to a show we like. Not affiliated with it.</p>` : '';
       return `<div class="proto p-huba${st.night ? ' night' : ''}">${hubaTop(pk)}<article class="story"><a class="back" href="#/p/huba/home">← All designs</a>
         <h1 class="D">${esc(d.name)}</h1>${ref}
-        <div class="two"><div class="win view"><div class="tb"><span class="dots"><i></i><i></i><i></i></span><span class="title">${esc(d.slug)}.png</span></div>${viewBlock(pk, 'vb')}</div><div>${ladder(pk)}${summary(pk)}${addBtn(pk)}</div></div></article>
+        <div class="two"><div class="win view"><div class="tb"><span class="dots"><i></i><i></i><i></i></span><span class="title">${esc(d.name)}</span></div>${viewBlock(pk, 'vb')}</div><div>${ladder(pk)}${summary(pk)}${addBtn(pk)}</div></div></article>
         <div class="buybar"><span><b>${esc(d.name)}</b> · ${pr.num == null ? 'price to confirm' : esc(pr.text)}</span>${buyUrl(S[pk].sel) ? `<a class="cta buy" href="${buyUrl(S[pk].sel)}" target="_blank" rel="noopener">Buy →</a>` : '<button class="cta" disabled>Soon</button>'}</div>${lightbox(pk)}</div>`;
     },
     bag(pk) { return `<div class="proto p-huba${S[pk].night ? ' night' : ''}">${hubaTop(pk)}<div class="bagpage"><a class="back" href="#/p/huba/home">← Keep browsing</a><div class="win" style="margin-top:14px"><div class="tb"><span class="dots"><i></i><i></i><i></i></span><span class="title">cart</span></div><div class="bagbody"><h1 class="D">Your cart</h1>${bagLines(pk)}</div></div></div></div>`; },
