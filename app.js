@@ -434,7 +434,7 @@
   // a design with more versions shows them as cards stacked behind the tile, in their own garment colors
   // every tile sits on a backing card; a design with more versions gets a red one (and a third card when there are three)
   const stacked = (d, inner) => `<span class="pvw stack${d.variants.length > 1 ? ' multi' : ''}${d.variants.length > 2 ? ' n3' : ''}">${inner}</span>`;
-  function card(d, i) { return `<div class="card" style="--d:${120 + i * 40}ms"><button class="qopen" type="button" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, false))}<span class="ex">${EXPAND}</span></button><a class="nm" href="#/p/huba/d/${d.id}">${esc(d.name)}${plusV(d)}</a><span class="fr">From $20</span></div>`; }
+  function card(d, i) { return `<div class="card" style="--d:${120 + i * 40}ms"><button class="qopen" type="button" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, i < 4))}<span class="ex">${EXPAND}</span></button><a class="nm" href="#/p/huba/d/${d.id}">${esc(d.name)}${plusV(d)}</a><span class="fr">From $20</span></div>`; }
   // product tiers: facts come from the product data; blank names for the two tees come from the brief
   const TIER = {
     tee: { price: '$20' }, premium: { price: '$25' }, ls: { price: '$25' }, lspremium: { price: '$40' }, crop: { price: '$30' }, crew: { price: '$38' }, crewpremium: { price: '$52' },
@@ -700,4 +700,12 @@
     else if (act === 'jump') { e.preventDefault(); const r = parse(); if (r.view !== 'home') { location.hash = `#/p/${r.p || 'hub'}/home`; setTimeout(() => { const t = document.getElementById(el.dataset.t); if (t) t.scrollIntoView({ behavior: smooth() }); }, 60); } else { const t = document.getElementById(el.dataset.t); if (t) t.scrollIntoView({ behavior: smooth() }); } }
   });
   render();
+  // warm the cache: once the page is idle, fetch every tile preview in the background, one at a time, so later scrolling finds them already loaded
+  const warmTiles = () => {
+    const list = DATA.designs.flatMap(d => d.variants.map(v => `prev/${v.key}-480.webp?r=${REL}`));
+    let i = 0;
+    const next = () => { if (i >= list.length) return; const im = new Image(); im.onload = im.onerror = () => setTimeout(next, 40); im.src = list[i++]; };
+    next();
+  };
+  (window.requestIdleCallback || (f => setTimeout(f, 1200)))(warmTiles);
 })();
