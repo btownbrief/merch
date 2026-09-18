@@ -105,6 +105,8 @@
     if (p.key === 'magnet' && a < 0.6) return 'too tall for a car magnet';
     return null;
   }
+  const HEAVY = ['crew', 'crewpremium', 'hoodie', 'hoodiepremium', 'zip'];   // ship at $7.39; the promotion covers $4.89, the buyer pays $2.50
+  const shipNote = p => HEAVY.includes(p.key) ? '$2.50 shipping · free on everything else' : 'Free shipping for a limited time';
   const BOTH_UP = 8;                    // front + back on any shirt
   const TOTE_TWO = 28;                  // canvas tote printed on both sides
   function priceOf(sel) {
@@ -179,7 +181,7 @@
   function summary(pk) {
     const sel = S[pk].sel, d = byId[sel.id], v = vOf(d, sel.vkey), p = PK[sel.product], pr = priceOf(sel);
     const size = noSize(p) ? '' : ' · ' + (sel.size || '<span class="tbc">size not chosen</span>');
-    return `<div class="sum"><span class="sl">Your pick</span><b>${esc(d.name)}</b>${d.variants.length > 1 ? ' · ' + esc(v.label) : ''} · ${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[sel.place] || sel.place.toLowerCase()} · ${sel.color}${size}<span class="sp">${pr.num == null ? '<span class="tbc">price to confirm</span>' : esc(pr.text)} <small class="ship">Free shipping for a limited time</small></span></div>`;
+    return `<div class="sum"><span class="sl">Your pick</span><b>${esc(d.name)}</b>${d.variants.length > 1 ? ' · ' + esc(v.label) : ''} · ${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[sel.place] || sel.place.toLowerCase()} · ${sel.color}${size}<span class="sp">${pr.num == null ? '<span class="tbc">price to confirm</span>' : esc(pr.text)} <small class="ship">${shipNote(p)}</small></span></div>`;
   }
   function needsSize(pk) { const sel = S[pk].sel; return !noSize(PK[sel.product]) && !sel.size; }
   // live store links: site/buy.js maps design|version|product|placement to the Printify Pop-Up store listing
@@ -204,7 +206,7 @@
       if (pr.num == null) open++; else total += pr.num;
       return `<div class="bag-line"><span class="th" style="background:${G[l.color]}"><img src="${v.file}?r=${REL}" alt="${esc(d.name)}"></span><div><b>${esc(d.name)}${d.variants.length > 1 ? ' · ' + esc(v.label) : ''}</b><small>${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[l.place] || l.place.toLowerCase()} · ${l.color}${noSize(p) ? '' : ' · ' + l.size}</small></div><div><b>${pr.num == null ? '<span class="tbc">TBC</span>' : money(pr.num)}</b>${buyUrl(l) ? `<a class="rm buy" href="${buyUrl(l)}" target="_blank" rel="noopener">buy →</a>` : ''}<button class="rm" data-act="rm" data-pk="${pk}" data-i="${i}">remove</button></div></div>`;
     }).join('');
-    const tot = `<p><b>Together: ${money(total)}</b>${open ? ` · ${open} line${open > 1 ? 's' : ''} with a price to confirm` : ''} · free shipping for a limited time.</p>`;
+    const tot = `<p><b>Together: ${money(total)}</b>${open ? ` · ${open} line${open > 1 ? 's' : ''} with a price to confirm` : ''} · free shipping for a limited time; hoodies, crewnecks and the full-zip add $2.50.</p>`;
     return `<div class="bag-lines">${lines}</div>${tot}`;
   }
   const REL = DATA.release || '01';
@@ -279,7 +281,7 @@
           <p class="credit">Burlington Harbor · Photograph by Steve Davis</p>
         </section>
         ${secs}
-        <footer class="foot"><span>Tees $20 · Premium $25 · Long sleeve $25 · Crop $30 · Crewneck $38 · Hoodie $45 · Full-zip $50 · Tote $22 · Stickers from $5 · Magnets from $12</span><span><b>Free shipping for a limited time.</b></span></footer>
+        <footer class="foot"><span>Tees $20 · Premium $25 · Long sleeve $25 · Crop $30 · Crewneck $38 · Hoodie $45 · Full-zip $50 · Tote $22 · Stickers from $5 · Magnets from $12</span><span><b>Free shipping for a limited time.</b> Hoodies, crewnecks and the full-zip add $2.50.</span></footer>
       </div>`;
       function rowOf(pk, d) { return `<a class="row" href="#/p/hub/d/${d.id}"><span class="n">${String(d.id).padStart(2, '0')}</span>${tileOf(d)}<span><span class="nm">${esc(d.name)}</span><div class="idea">${esc(d.idea)}</div></span><span class="fr"><b>From $20</b>${d.variants.length > 1 ? d.variants.length + ' versions' : ''}</span></a>`; }
     },
@@ -450,7 +452,7 @@
         <section class="cover"><img class="photo px" src="img/harbor.jpg?v=4" fetchpriority="high" decoding="async" alt="Burlington Harbor from above at dusk">
           <div class="ct"><div class="eyebrow">Burlington, Vermont</div><h1 class="D">Things to wear<br>for Burlington</h1>
             <ol class="toc">${SECTIONS.map(s => `<li><span class="n">[${s.n}]</span><span class="ld"></span><a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a></li>`).join('')}</ol>
-            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price}<span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8 · larger sizes a few dollars more</li></ul>
+            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time · hoodies, crewnecks and the full-zip add $2.50</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price}<span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8 · larger sizes a few dollars more</li></ul>
             <p class="onwhat-links"><a href="#/p/huba/home" data-act="jump" data-t="about">About the maker ↓</a></p></div>
           ${gridWin(pk)}
           ${nightPill(pk)}
