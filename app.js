@@ -117,7 +117,6 @@
     if (up) { num += up; bits.push(`$${up} for ${sel.size}`); }
     let t = money(num);
     if (bits.length) t += ' · includes ' + bits.join(' and ');
-    else if (p.key === 'premium') t += ' · $5 more than standard';
     return { num, text: t };
   }
   function ensureValid(st) {
@@ -153,21 +152,21 @@
     const prods = PR;   // every design gets the full lineup (since 2026-09-19)
     rows.push(row('Product', prods.map(p => {
       const why = avail(d, v, p);
-      const pr = p.price == null ? '<small>price to confirm</small>' : (p.key === 'premium' ? `<small>${money(p.price)} · $5 more</small>` : `<small>${money(p.price)}</small>`);
+      const pr = p.price == null ? '<small>price to confirm</small>' : `<small>${money(p.price)}</small>`;
       const cap = '';
       return opt({ pk, k: 'product', val: p.key, on: sel.product === p.key, dis: !!why, label: p.label, extra: why ? `<small>${esc(why)}</small>` : pr + cap, title: why || p.note || '' });
-    }).join(''), opts.compact ? 'larger sizes add a few dollars; the total updates as you choose' : ''));
+    }).join(''), opts.compact ? 'Larger sizes add a few dollars.' : ''));
     // placement
     const PL = { Front: 'Front print', Back: 'Back print', Both: 'Both' };
-    rows.push(row('Print', prod.places.map(pl => opt({ pk, k: 'place', val: pl, on: sel.place === pl, label: (PL[pl] || pl) + (pl === 'Both' || pl === 'Two sides' ? '*' : '') })).join(''),
-      (prod.places.includes('Both') ? `Front print or back print: the full design, roughly 8 to 10 in wide depending on the product${prod.key === 'zip' ? ' (on the full-zip the front print is the small chest version, beside the zipper)' : ''}. * Both: the full design on the back plus the small chest version on the front, +$${BOTH_UP}.` : (prod.key === 'tote' ? 'One side $22 · two sides $28' : (prod.note || '')))));
+    rows.push(row('Print', prod.places.map(pl => opt({ pk, k: 'place', val: pl, on: sel.place === pl, label: (PL[pl] || pl) + (pl === 'Both' ? ' · +$8' : pl === 'Two sides' ? ' · $28' : '') })).join(''),
+      (prod.places.includes('Both') ? `Front or back: the full design, roughly 8 to 10 in wide${prod.key === 'zip' ? ' (on the full-zip, the front print is the small chest version beside the zipper)' : ''}. Both: the full design on the back plus the small chest print on the front.` : (prod.key === 'tote' ? 'One side $22 · two sides $28' : (prod.note || '')))));
     // version: chosen in the carousel above the options (dots + swipe), not repeated here
     // color
     if (colorless(prod)) rows.push(row('Color', `<span class="lad-static">${prod.key === 'sticker' ? 'The sticker follows the art; no garment color.' : 'One color for this product.'}</span>`, ''));
-    else rows.push(row('Garment color', suitFor(v, prod).map(c => `<button class="opt sw${sel.color === c ? ' on' : ''}" aria-pressed="${sel.color === c}" style="background:${G[c]}" title="${c}" aria-label="${c}" data-act="pick" data-pk="${pk}" data-k="color" data-v="${c}"></button>`).join(''), (() => { const cs = (window.BTOWN_COLORS || {})[prod.key]; return cs && cs.length ? `${sel.color} shown · at checkout this blank comes in ${cs.length} colors: ${cs.join(', ')}` : `${sel.color} · every color the blank comes in is offered at checkout`; })()));
+    else rows.push(row('Garment color', suitFor(v, prod).map(c => `<button class="opt sw${sel.color === c ? ' on' : ''}" aria-pressed="${sel.color === c}" style="background:${G[c]}" title="${c}" aria-label="${c}" data-act="pick" data-pk="${pk}" data-k="color" data-v="${c}"></button>`).join(''), (() => { const cs = (window.BTOWN_COLORS || {})[prod.key]; return cs && cs.length ? `${sel.color} shown · ${cs.length} colors at checkout: ${cs.join(', ')}` : `${sel.color} · every color the blank comes in is offered at checkout`; })()));
     // size
     rows.unshift(rows.pop());   // colour first, so the preview recolours before anything else is chosen (Stephen, 2026-09-19)
-    if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''), (sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]} (Printify's larger-size cost)` : 'Standard price') : 'Choose a size')));
+    if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''), (sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]}` : 'Standard price') : 'Choose a size')));
     const note = st.note ? `<div class="lad-note ${st.noteKind || 'warn'}">${esc(st.note)}</div>` : '';
     return `<div class="lad">${note}${rows.join('')}</div>`;
   }
@@ -180,7 +179,7 @@
   function summary(pk) {
     const sel = S[pk].sel, d = byId[sel.id], v = vOf(d, sel.vkey), p = PK[sel.product], pr = priceOf(sel);
     const size = noSize(p) ? '' : ' · ' + (sel.size || '<span class="tbc">size not chosen</span>');
-    return `<div class="sum"><span class="sl">Your pick</span><b>${esc(d.name)}</b>${d.variants.length > 1 ? ' · ' + esc(v.label) : ''} · ${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[sel.place] || sel.place.toLowerCase()} · ${sel.color}${size}<span class="sp">${pr.num == null ? '<span class="tbc">price to confirm</span>' : esc(pr.text)} <small>+ shipping, to be confirmed</small></span></div>`;
+    return `<div class="sum"><span class="sl">Your pick</span><b>${esc(d.name)}</b>${d.variants.length > 1 ? ' · ' + esc(v.label) : ''} · ${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[sel.place] || sel.place.toLowerCase()} · ${sel.color}${size}<span class="sp">${pr.num == null ? '<span class="tbc">price to confirm</span>' : esc(pr.text)} <small class="ship">Free shipping for a limited time</small></span></div>`;
   }
   function needsSize(pk) { const sel = S[pk].sel; return !noSize(PK[sel.product]) && !sel.size; }
   // live store links: site/buy.js maps design|version|product|placement to the Printify Pop-Up store listing
@@ -189,7 +188,7 @@
   function addBtn(pk, label) {
     if (pk === 'huba') {
       const sel = S[pk].sel, url = buyUrl(sel);
-      if (url) return `<a class="cta buy" href="${url}" target="_blank" rel="noopener">Buy this on the BTown Brief store →</a><small class="buynote">Opens the store page for this exact shirt and print in a new tab. Pick ${esc(sel.color || 'your color')}${sel.size ? ' and ' + esc(sel.size) : ''} again there; every color the blank comes in is offered.</small>`;
+      if (url) return `<a class="cta buy" href="${url}" target="_blank" rel="noopener">Buy this on the BTown Brief store →</a><small class="buynote">Opens this exact listing in a new tab. Choose your color and size there.</small><button class="save" type="button" data-act="add" data-pk="${pk}">Save for later</button>`;
       return `<button class="cta" disabled>Coming to the store shortly</button>`;
     }
     const ns = needsSize(pk); return `<button class="cta" data-act="add" data-pk="${pk}" ${ns ? 'disabled' : ''}>${ns ? 'Choose a size to add' : (label || 'Add to bag')}</button>`;
@@ -203,9 +202,9 @@
       const d = byId[l.id], v = vOf(d, l.vkey), p = PK[l.product], pr = priceOf(l);
       const two = l.place === 'Both' || l.place === 'Two sides'; if (two) sides++;
       if (pr.num == null) open++; else total += pr.num;
-      return `<div class="bag-line"><span class="th" style="background:${G[l.color]}"><img src="${v.file}?r=${REL}" alt="${esc(d.name)}"></span><div><b>${esc(d.name)}${d.variants.length > 1 ? ' · ' + esc(v.label) : ''}</b><small>${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[l.place] || l.place.toLowerCase()} · ${l.color}${noSize(p) ? '' : ' · ' + l.size}</small></div><div><b>${pr.num == null ? '<span class="tbc">TBC</span>' : money(pr.num)}</b><button class="rm" data-act="rm" data-pk="${pk}" data-i="${i}">remove</button></div></div>`;
+      return `<div class="bag-line"><span class="th" style="background:${G[l.color]}"><img src="${v.file}?r=${REL}" alt="${esc(d.name)}"></span><div><b>${esc(d.name)}${d.variants.length > 1 ? ' · ' + esc(v.label) : ''}</b><small>${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[l.place] || l.place.toLowerCase()} · ${l.color}${noSize(p) ? '' : ' · ' + l.size}</small></div><div><b>${pr.num == null ? '<span class="tbc">TBC</span>' : money(pr.num)}</b>${buyUrl(l) ? `<a class="rm buy" href="${buyUrl(l)}" target="_blank" rel="noopener">buy →</a>` : ''}<button class="rm" data-act="rm" data-pk="${pk}" data-i="${i}">remove</button></div></div>`;
     }).join('');
-    const tot = `<p><b>Total: ${money(total)}</b>${open ? ` · ${open} line${open > 1 ? 's' : ''} with a price to confirm` : ''} · shipping and tax at checkout.</p>`;
+    const tot = `<p><b>Together: ${money(total)}</b>${open ? ` · ${open} line${open > 1 ? 's' : ''} with a price to confirm` : ''} · free shipping for a limited time.</p>`;
     return `<div class="bag-lines">${lines}</div>${tot}`;
   }
   const REL = DATA.release || '01';
@@ -228,7 +227,7 @@
     const strip = fr && !room ? `<div class="pair">${chip}<span class="ptext"><b>Small front print</b> · about 3½ in wide on the left chest when you choose both sides · the main design goes on the back · front print only is the full design</span></div>` : '';
     const body = multi ? `<div class="vcar"><div class="vtrack" tabindex="0" data-vcar aria-roledescription="carousel" aria-label="Versions of ${esc(d.name)}. Swipe, drag, or use the arrow keys.">${d.variants.map((vv, i) => `<div class="vslide" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${d.variants.length}: ${esc(vv.label)}">${one(vv)}</div>`).join('')}</div><button class="varr l" data-act="vstep" data-pk="${pk}" data-dir="-1" aria-label="Previous version"${vi === 0 ? ' hidden' : ''}>‹</button><button class="varr r" data-act="vstep" data-pk="${pk}" data-dir="1" aria-label="Next version"${vi === d.variants.length - 1 ? ' hidden' : ''}>›</button>${room ? chip : ''}</div><div class="vdots"><span role="tablist" aria-label="Versions">${d.variants.map((vv, i) => `<button role="tab" class="vdot${i === vi ? ' on' : ''}" aria-selected="${i === vi}" tabindex="${i === vi ? 0 : -1}" data-act="pick" data-pk="${pk}" data-k="vkey" data-v="${vv.key}" aria-label="Version ${i + 1}: ${esc(vv.label)}"></button>`).join('')}</span><span class="vlab" aria-live="polite">${esc(v.label)} · ${vi + 1} of ${d.variants.length}</span></div>` : `<div class="vcar solo">${one(v)}${room ? chip : ''}</div>`;
     const chest = fr && frontHere(p, sel.place);
-    const cap = st.view === 'art' ? `Shown on ${sel.color} · the shirt colour is a preview; the print itself is exact`
+    const cap = st.view === 'art' ? `Shown on ${sel.color}`
       : sel.place === 'Both' ? `${p.label} · small front print on the left chest, full design on the back`
       : p.aop ? `${p.label} · the design covers the whole bag`
       : chest ? `${p.label} · ${p.method === 'embroidery' ? 'embroidered ' : ''}front print, about ${['hat', 'beanie'].includes(p.sil) ? 3 : 3.5} in wide`
@@ -280,7 +279,7 @@
           <p class="credit">Burlington Harbor · Photograph by Steve Davis</p>
         </section>
         ${secs}
-        <footer class="foot"><span>Tees $20 · Premium $25 · Long sleeve $25 · Crop $30 · Crewneck $38 · Hoodie $45 · Full-zip $50 · Tote $22 · Stickers from $5 · Magnets from $12</span><span>Prototype. Checkout links come next.</span></footer>
+        <footer class="foot"><span>Tees $20 · Premium $25 · Long sleeve $25 · Crop $30 · Crewneck $38 · Hoodie $45 · Full-zip $50 · Tote $22 · Stickers from $5 · Magnets from $12</span><span><b>Free shipping for a limited time.</b></span></footer>
       </div>`;
       function rowOf(pk, d) { return `<a class="row" href="#/p/hub/d/${d.id}"><span class="n">${String(d.id).padStart(2, '0')}</span>${tileOf(d)}<span><span class="nm">${esc(d.name)}</span><div class="idea">${esc(d.idea)}</div></span><span class="fr"><b>From $20</b>${d.variants.length > 1 ? d.variants.length + ' versions' : ''}</span></a>`; }
     },
@@ -398,9 +397,9 @@
     7: [['img/docksunset.jpg', 'Waterfront docks at sunset', 1000, 1000, 'center 60%']],
   };
   const PAGE = 12;
-  function band(n) { const b = BANDS[n]; if (!b) return ''; return `<div class="band c${b.length}">${b.map(([s, t, w, h, pos], i) => `<figure><div class="pw rv" style="--d:${250 + i * 120}ms"><img class="px" src="${s}" alt="${esc(t)}" width="${w}" height="${h}" loading="lazy" decoding="async"></div></figure>`).join('')}<span class="cr">Photographs by Steve Davis</span></div>`; }
+  function band(n) { const b = BANDS[n]; if (!b) return ''; return `<div class="band c${b.length}">${b.map(([s, t, w, h, pos], i) => `<figure><div class="pw rv" style="--d:${250 + i * 120}ms"><img class="px" src="${s}" alt="${esc(t)}" width="${w}" height="${h}" loading="eager" fetchpriority="high" decoding="async"></div></figure>`).join('')}<span class="cr">Photographs by Steve Davis</span></div>`; }
   function hubaTop(pk) {
-    return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark" href="#/p/huba/bag">Cart (${bagCount(pk)})</a></header>`;
+    return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark" href="#/p/huba/bag">Saved (${bagCount(pk)})</a></header>`;
   }
   const preview = (d, eager) => { const v = d.variants[0]; return `<div class="artf pv" style="background:${v.garment}"><img src="prev/${v.key}-480.webp?r=${REL}" alt="${esc(d.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`; };
   function gridTile(d, eager) { return `<a class="gt" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}">${stacked(d, preview(d, eager))}<b>${esc(d.name)}${plusV(d)}</b></a>`; }
@@ -426,7 +425,7 @@
     const st = S[pk]; const cur = Math.min(pages.length - 1, Math.max(0, st.page || 0));
     return `<div class="win"><div class="tb"><span class="dots pd">${pages.map((p, i) => `<button class="dot${i === cur ? ' on' : ''}" data-act="pageto" data-pk="${pk}" data-page="${i}" aria-label="Page ${i + 1}" aria-pressed="${i === cur}"></button>`).join('')}</span><span class="title">merch.exe</span><span class="cnt">Page ${cur + 1} of ${pages.length}</span></div>
       <div class="pager"><div class="track" data-pages style="transform:translateX(-${cur * 100}%)">${pages.map((p, i) => `<div class="page" data-page="${i + 1}" ${i === cur ? '' : 'aria-hidden="true"'}>${p.map(d => gridTile(d, i === 0)).join('')}</div>`).join('')}</div><button class="arr l" data-act="page" data-pk="${pk}" data-dir="-1" aria-label="Previous page" ${cur === 0 ? 'disabled' : ''}>‹</button><button class="arr r" data-act="page" data-pk="${pk}" data-dir="1" aria-label="Next page" ${cur >= pages.length - 1 ? 'disabled' : ''}>›</button></div>
-      <div class="status"><span>${DES.length} designs · ${pages.length} pages</span><span class="sr"><a href="#" data-act="random" data-pk="huba">Surprise me</a> · <a href="#/p/huba/bag">Cart (${bagCount(pk)})</a></span></div></div>`;
+      <div class="status"><span>${DES.length} designs · ${pages.length} pages</span><span class="sr"><a href="#" data-act="random" data-pk="huba">Surprise me</a> · <a href="#/p/huba/bag">Saved (${bagCount(pk)})</a></span></div></div>`;
   }
   // "(+2 versions)" after the name wherever a design has more than one
   const plusV = d => d.variants.length > 1 ? ` <span class="pv">(+${d.variants.length - 1} version${d.variants.length > 2 ? 's' : ''})</span>` : '';
@@ -436,12 +435,12 @@
   function card(d, i) { return `<div class="card" style="--d:${120 + i * 40}ms"><button class="qopen" type="button" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, false))}<span class="ex">${EXPAND}</span></button><a class="nm" href="#/p/huba/d/${d.id}">${esc(d.name)}${plusV(d)}</a><span class="fr">From $20</span></div>`; }
   // product tiers: facts come from the product data; blank names for the two tees come from the brief
   const TIER = {
-    tee: { price: '$20' }, premium: { price: '+$5' }, ls: { price: '$25' }, lspremium: { price: '$40' }, crop: { price: '$30' }, crew: { price: '$38' }, crewpremium: { price: '$52' },
+    tee: { price: '$20' }, premium: { price: '$25' }, ls: { price: '$25' }, lspremium: { price: '$40' }, crop: { price: '$30' }, crew: { price: '$38' }, crewpremium: { price: '$52' },
     hoodie: { price: '$45' }, hoodiepremium: { price: '$55' }, zip: { price: '$50' }, tote: { price: '$22 · both sides $28' }, sticker: { price: 'from $5' }, magnet: { price: 'from $12' },
   };
   function about() {
     const ab = DATA.about || {}; if (!ab.text) return '';
-    return `<section class="about" id="about"><h2 class="D">${esc(ab.heading || 'About')}</h2><p>${esc(ab.text)}</p></section>`;
+    return `<section class="about" id="about"><h2 class="D">${esc(ab.heading || 'About')}</h2><p>${esc(ab.text)}</p><p class="more">If you like these, <a href="https://www.btownbrief.com" target="_blank" rel="noopener">read the newsletter</a>, <a href="https://www.meetup.com/burlington-social-activites-group/" target="_blank" rel="noopener">come to a meetup</a>, and <a href="https://play.btownbrief.com/" target="_blank" rel="noopener">play the arcade</a>.</p></section>`;
   }
   T.huba = {
     home(pk) {
@@ -451,7 +450,7 @@
         <section class="cover"><img class="photo px" src="img/harbor.jpg?v=4" fetchpriority="high" decoding="async" alt="Burlington Harbor from above at dusk">
           <div class="ct"><div class="eyebrow">Burlington, Vermont</div><h1 class="D">Things to wear<br>for Burlington</h1>
             <ol class="toc">${SECTIONS.map(s => `<li><span class="n">[${s.n}]</span><span class="ld"></span><a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a></li>`).join('')}</ol>
-            <ul class="onwhat">${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price} · ${esc(p.blank)}</li>`).join('')}<li><b>Front print, back print, or both</b> on every shirt · both sides +$8 · larger sizes a few dollars more</li></ul>
+            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price}<span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8 · larger sizes a few dollars more</li></ul>
             <p class="onwhat-links"><a href="#/p/huba/home" data-act="jump" data-t="about">About the maker ↓</a></p></div>
           ${gridWin(pk)}
           ${nightPill(pk)}
@@ -471,7 +470,7 @@
         <div class="two"><div class="win view"><div class="tb"><span class="dots"><i></i><i></i><i></i></span><span class="title">${esc(d.name)}</span></div>${viewBlock(pk, 'vb')}</div><div>${ladder(pk)}${summary(pk)}${addBtn(pk)}</div></div></article>
         <div class="buybar"><span><b>${esc(d.name)}</b> · ${pr.num == null ? 'price to confirm' : esc(pr.text)}</span>${buyUrl(S[pk].sel) ? `<a class="cta buy" href="${buyUrl(S[pk].sel)}" target="_blank" rel="noopener">Buy →</a>` : '<button class="cta" disabled>Soon</button>'}</div>${lightbox(pk)}</div>`;
     },
-    bag(pk) { return `<div class="proto p-huba${S[pk].night ? ' night' : ''}">${hubaTop(pk)}<div class="bagpage"><a class="back" href="#/p/huba/home">← Keep browsing</a><div class="win" style="margin-top:14px"><div class="tb"><span class="dots"><i></i><i></i><i></i></span><span class="title">cart</span></div><div class="bagbody"><h1 class="D">Your cart</h1>${bagLines(pk)}</div></div></div></div>`; },
+    bag(pk) { return `<div class="proto p-huba${S[pk].night ? ' night' : ''}">${hubaTop(pk)}<div class="bagpage"><a class="back" href="#/p/huba/home">← Keep browsing</a><div class="win" style="margin-top:14px"><div class="tb"><span class="dots"><i></i><i></i><i></i></span><span class="title">saved</span></div><div class="bagbody"><h1 class="D">Saved for later</h1><p class="lede">Your picks, kept here on this device. Each one buys on the BTown Brief store.</p>${bagLines(pk)}</div></div></div></div>`; },
   };
 
   // scroll effects for prototype 5: reveal on scroll (fade + rise; images settle from a slight zoom) and a soft parallax on photographs
@@ -682,7 +681,7 @@
     if (act === 'pick') { const st = S[pk]; const k = el.dataset.k, v = el.dataset.v; st.sel[k] = v; st.note = ''; st.noteKind = ''; ensureValid(st); render(); const f = document.querySelector(`[data-act="pick"][data-pk="${pk}"][data-k="${k}"][data-v="${v.replace(/"/g, '\\"')}"]`); if (f) f.focus({ preventScroll: true }); }
     else if (act === 'view') { S[pk].view = el.dataset.v; render(); }
     else if (act === 'night') { S[pk].night = !S[pk].night; render(); }
-    else if (act === 'add') { const st = S[pk]; if (needsSize(pk)) { st.note = 'Choose a size first.'; st.noteKind = 'warn'; render(); return; } st.bag.push(Object.assign({}, st.sel)); st.note = pk === 'huba' ? 'Added to your cart.' : 'Added to your bag.'; st.noteKind = 'ok'; render(); }
+    else if (act === 'add') { const st = S[pk]; if (needsSize(pk)) { st.note = 'Choose a size first.'; st.noteKind = 'warn'; render(); return; } st.bag.push(Object.assign({}, st.sel)); st.note = pk === 'huba' ? 'Saved for later.' : 'Added to your bag.'; st.noteKind = 'ok'; render(); }
     else if (act === 'peek') { e.preventDefault(); S[pk].tour = true; S[pk].tourAt = +el.dataset.id; S[pk].tourAuto = false; render(); }
     else if (act === 'tour') { if (el.classList.contains('ov') && e.target !== el) return; S[pk].tour = !S[pk].tour; S[pk].tourAuto = S[pk].tour && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); if (!S[pk].tour) S[pk].tourAt = null; render(); }
     else if (act === 'hstep') { const tr = el.parentElement.querySelector('[data-htrack]'); tr.scrollBy({ left: (+el.dataset.dir) * tr.clientWidth, behavior: smooth() }); }

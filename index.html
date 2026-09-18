@@ -1,5 +1,5 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BTown Brief Merch</title>
-<link rel="preload" as="image" href="img/harbor.jpg?v=4" fetchpriority="high"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="img/harbor.jpg?v=4" fetchpriority="high"><link rel="preload" as="image" href="img/sculpture.jpg?v=4"><link rel="preload" as="image" href="img/steel.jpg?v=4"><link rel="preload" as="image" href="img/lakesunset.jpg?v=4"><link rel="preload" as="image" href="img/bikepath.jpg?v=4"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,700;1,400&family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;600&family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@700;800&display=swap">
 <style>
 /* ---------- switcher (page chrome, not part of any prototype) ---------- */
@@ -342,9 +342,17 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 .p-huba .toc .n{font-family:Archivo;font-size:12px;opacity:.9}
 .p-huba .toc .ld{flex:1;border-bottom:2px dotted rgba(250,249,245,.5);transform:translateY(-5px)}
 .p-huba .toc a:hover{text-decoration:underline;text-underline-offset:4px}
-.p-huba .onwhat{max-width:420px;margin:18px 0 0;padding:14px 16px 14px 34px;border:1px solid rgba(250,249,245,.38);border-radius:10px;background:rgba(20,20,19,.34);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);font-size:13.5px;line-height:1.55;color:#faf9f5;box-shadow:0 12px 30px -16px rgba(0,0,0,.6);position:relative}
+.p-huba .onwhat{max-width:420px;margin:18px 0 0;padding:14px 16px 14px 16px;border:1px solid rgba(250,249,245,.38);border-radius:10px;background:rgba(20,20,19,.34);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);font-size:13.5px;line-height:1.55;color:#faf9f5;box-shadow:0 12px 30px -16px rgba(0,0,0,.6);position:relative}
 .p-huba .onwhat::before{content:"Prices & blanks";position:absolute;left:14px;top:-9px;padding:1px 8px;border-radius:999px;background:#faf9f5;color:#141413;font-family:Archivo,system-ui,sans-serif;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
-.p-huba .onwhat li{padding:1px 0}
+.p-huba .onwhat li{padding:1px 0;display:flex;align-items:baseline;gap:6px;list-style:none}
+.p-huba .onwhat li .ld{flex:1;min-width:14px;border-bottom:1px dotted rgba(250,249,245,.55);transform:translateY(-4px)}
+.p-huba .onwhat li i{font-style:normal;opacity:.85;white-space:nowrap}
+.p-huba .onwhat li.wide,.p-huba .onwhat li.ship{display:block}
+.p-huba .onwhat li.ship{margin-bottom:4px;font-size:13px}
+.p-huba .onwhat li.ship b{color:#ffd9a8}
+.p-huba .sum .ship{display:block;color:#2f5d3a;font-weight:600}
+.p-huba .save{display:block;margin-top:8px;background:none;border:0;padding:0;color:var(--mute);font-size:12px;text-decoration:underline;cursor:pointer}
+.p-huba .bag-line .rm.buy{text-decoration:none;font-weight:600;margin-right:8px}
 .p-huba .onwhat li::marker{color:rgba(250,249,245,.6)}
 .p-huba .onwhat b{font-weight:600;color:#faf9f5}
 .p-huba .cover .credit{position:absolute;right:20px;bottom:12px;margin:0;font-size:11px;color:rgba(250,249,245,.72)}
@@ -394,8 +402,8 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 .p-huba .card .qopen{align-self:stretch}
 .p-huba .qopen{display:block;width:100%;padding:0;border:0;background:none;position:relative;cursor:zoom-in;color:inherit;font:inherit;text-align:left;border-radius:6px}
 .p-huba .qopen:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.p-huba .ex{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(250,249,245,.5);color:rgba(20,20,19,.75);border:1px solid rgba(20,20,19,.08);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:transform .15s ease,background .15s ease,color .15s ease}
-.p-huba .ex svg{width:11px;height:11px}
+.p-huba .ex{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:rgba(250,249,245,.28);color:rgba(20,20,19,.5);border:1px solid rgba(20,20,19,.08);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:transform .15s ease,background .15s ease,color .15s ease}
+.p-huba .ex svg{width:8px;height:8px}
 .p-huba .qopen:hover .ex{transform:scale(1.1);background:rgba(250,249,245,.95);color:#141413}
 .p-huba{--stackback:#d9d3c5;--red:#c8321b;--red2:#a3260f;--lift:0 14px 28px -14px rgba(20,20,19,.45),0 3px 8px -3px rgba(20,20,19,.18)}
 .p-huba.night{--stackback:#3b3e37;--lift:0 14px 28px -12px rgba(0,0,0,.8),0 3px 8px -3px rgba(0,0,0,.5)}
@@ -797,4 +805,4 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 <div id="stage"></div>
 <script src="buy.js?v=1789753394"></script>
 <script src="data.js?v=1789737172" charset="utf-8"></script>
-<script src="app.js?v=1789751275" charset="utf-8"></script>
+<script src="app.js?v=1789754168" charset="utf-8"></script>
