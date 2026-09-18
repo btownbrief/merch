@@ -157,7 +157,7 @@
       const pr = p.price == null ? '<small>price to confirm</small>' : `<small>${money(p.price)}</small>`;
       const cap = '';
       return opt({ pk, k: 'product', val: p.key, on: sel.product === p.key, dis: !!why, label: p.label, extra: why ? `<small>${esc(why)}</small>` : pr + cap, title: why || p.note || '' });
-    }).join(''), opts.compact ? 'Larger sizes add a few dollars.' : ''));
+    }).join(''), ''));
     // placement
     const PL = { Front: 'Front print', Back: 'Back print', Both: 'Both' };
     rows.push(row('Print', prod.places.map(pl => opt({ pk, k: 'place', val: pl, on: sel.place === pl, label: (PL[pl] || pl) + (pl === 'Both' ? ' · +$8' : pl === 'Two sides' ? ' · $28' : '') })).join(''),
@@ -399,7 +399,7 @@
     7: [['img/docksunset.jpg', 'Waterfront docks at sunset', 1000, 1000, 'center 60%']],
   };
   const PAGE = 12;
-  function band(n) { const b = BANDS[n]; if (!b) return ''; return `<div class="band c${b.length}">${b.map(([s, t, w, h, pos], i) => `<figure><div class="pw rv" style="--d:${250 + i * 120}ms"><img class="px" src="${s}" alt="${esc(t)}" width="${w}" height="${h}" loading="eager" fetchpriority="high" decoding="async"></div></figure>`).join('')}<span class="cr">Photographs by Steve Davis</span></div>`; }
+  function band(n) { const b = BANDS[n]; if (!b) return ''; return `<div class="band c${b.length}">${b.map(([s, t, w, h, pos], i) => `<figure><div class="pw"><img class="px" src="${s}" alt="${esc(t)}" width="${w}" height="${h}" loading="eager" fetchpriority="high" decoding="async"></div></figure>`).join('')}<span class="cr">Photographs by Steve Davis</span></div>`; }
   function hubaTop(pk) {
     return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark" href="#/p/huba/bag">Saved (${bagCount(pk)})</a></header>`;
   }
@@ -452,7 +452,7 @@
         <section class="cover"><img class="photo px" src="img/harbor.jpg?v=4" fetchpriority="high" decoding="async" alt="Burlington Harbor from above at dusk">
           <div class="ct"><div class="eyebrow">Burlington, Vermont</div><h1 class="D">Things to wear<br>for Burlington</h1><p class="jackson"><b>Tees start at $20 shipped!</b><br>That’s a single Andrew Jackson</p>
             <ol class="toc">${SECTIONS.map(s => `<li><span class="n">[${s.n}]</span><span class="ld"></span><a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a></li>`).join('')}</ol>
-            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time · hoodies, crewnecks and the full-zip add $2.50</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price}<span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8 · larger sizes a few dollars more</li></ul>
+            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time · hoodies, crewnecks and the full-zip add $2.50</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price}<span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8</li></ul>
             <p class="onwhat-links"><a href="#/p/huba/home" data-act="jump" data-t="about">About the maker ↓</a></p></div>
           ${gridWin(pk)}
           ${nightPill(pk)}
