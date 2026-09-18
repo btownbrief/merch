@@ -39,7 +39,8 @@
   const gname = hex => { if (!hex) return 'Cream'; const k = hex.toUpperCase(); if (GN[k]) return GN[k]; const c = hexRGB(k); let best = 'Cream', bd = Infinity; for (const n in G) { const g = hexRGB(G[n].toUpperCase()); const dd = (c[0] - g[0]) ** 2 + (c[1] - g[1]) ** 2 + (c[2] - g[2]) ** 2; if (dd < bd) { bd = dd; best = n; } } return best; };
   const SUNNY = { 3: 1, 9: 1, 15: 1, 21: 1, 27: 1, 33: 1, 40: 1, 45: 1 };
   const noSize = p => !(p.sizes && p.sizes.length);
-  const suitFor = (v, p) => { const s = (p.colors && p.colors.length) ? v.suit.filter(c => p.colors.includes(c)) : v.suit; return s.length ? s : v.suit; };
+  // every palette colour the product comes in, the design's own colours first (Printify offers the full list at checkout)
+  const suitFor = (v, p) => { const all = (p.colors && p.colors.length) ? p.colors : v.suit; const first = v.suit.filter(c => all.includes(c)); return first.concat(all.filter(c => !first.includes(c))); };
   const colorless = p => p.colors && p.colors.length === 0;
   const reduced = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const smooth = () => reduced() ? 'auto' : 'smooth';
@@ -149,7 +150,7 @@
     const rows = [];
     // product
     // scope switch: with a core list in data.js, only core designs offer the full lineup; the rest offer the two tees
-    const core = DATA.core || []; const prods = core.length && !core.includes(d.id) ? PR.filter(p => p.key === 'tee' || p.key === 'premium') : PR;
+    const prods = PR;   // every design gets the full lineup (since 2026-09-19)
     rows.push(row('Product', prods.map(p => {
       const why = avail(d, v, p);
       const pr = p.price == null ? '<small>price to confirm</small>' : (p.key === 'premium' ? `<small>${money(p.price)} · $5 more</small>` : `<small>${money(p.price)}</small>`);
@@ -163,7 +164,7 @@
     // version: chosen in the carousel above the options (dots + swipe), not repeated here
     // color
     if (colorless(prod)) rows.push(row('Color', `<span class="lad-static">${prod.key === 'sticker' ? 'The sticker follows the art; no garment color.' : 'One color for this product.'}</span>`, ''));
-    else rows.push(row('Garment color', suitFor(v, prod).map(c => `<button class="opt sw${sel.color === c ? ' on' : ''}" aria-pressed="${sel.color === c}" style="background:${G[c]}" title="${c}" aria-label="${c}" data-act="pick" data-pk="${pk}" data-k="color" data-v="${c}"></button>`).join(''), `${sel.color} · the colors this design was drawn for; every color the blank comes in is offered at checkout`));
+    else rows.push(row('Garment color', suitFor(v, prod).map(c => `<button class="opt sw${sel.color === c ? ' on' : ''}" aria-pressed="${sel.color === c}" style="background:${G[c]}" title="${c}" aria-label="${c}" data-act="pick" data-pk="${pk}" data-k="color" data-v="${c}"></button>`).join(''), (() => { const cs = (window.BTOWN_COLORS || {})[prod.key]; return cs && cs.length ? `${sel.color} shown · at checkout this blank comes in ${cs.length} colors: ${cs.join(', ')}` : `${sel.color} · every color the blank comes in is offered at checkout`; })()));
     // size
     if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''), (sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]} (Printify's larger-size cost)` : 'Standard price') : 'Choose a size')));
     const note = st.note ? `<div class="lad-note ${st.noteKind || 'warn'}">${esc(st.note)}</div>` : '';
