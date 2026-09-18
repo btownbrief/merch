@@ -607,7 +607,7 @@
       const pause = () => { if (!st.tourAuto) return; st.tourAuto = false; setBtn(); stop(); };
       ts.__toggle = () => { st.tourAuto = !st.tourAuto; setBtn(); arm(); };
       ts.__pause = pause;
-      ts.addEventListener('pointerdown', pause); // a click, a touch, or the start of any swipe on the design stops auto-advance
+      ts.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest('.tplay')) return; pause(); }); // a touch or swipe on the design pauses; the ring button toggles on its own
       window.__tourStop = stop;
       ts.scrollTop = at * ts.clientHeight; upd(); ts.addEventListener('scroll', upd, { passive: true });
       setTimeout(() => ts.focus({ preventScroll: true }), 0);
