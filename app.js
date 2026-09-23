@@ -190,7 +190,7 @@
   function addBtn(pk, label) {
     if (pk === 'huba') {
       const sel = S[pk].sel, url = buyUrl(sel);
-      if (url) return `<a class="cta buy" href="${url}" target="_blank" rel="noopener">Buy this on the BTown Brief store →</a><small class="buynote">Opens this exact listing in a new tab. Choose your color and size there.</small><button class="save" type="button" data-act="add" data-pk="${pk}">Save for later</button>`;
+      if (url) return `<a class="cta buy" href="${url}" target="_blank" rel="noopener">Buy this on the BTown Brief store →</a><small class="buynote">Opens this exact listing in a new tab. Choose your color and size there.</small><button class="save${isSaved(pk, sel.id) ? ' on' : ''}" type="button" data-act="fsave" data-pk="${pk}" data-id="${sel.id}" aria-pressed="${isSaved(pk, sel.id)}">${HEART}<span>${isSaved(pk, sel.id) ? 'Saved for later' : 'Save for later'}</span></button>`;
       return `<button class="cta" disabled>Coming to the store shortly</button>`;
     }
     const ns = needsSize(pk); return `<button class="cta" data-act="add" data-pk="${pk}" ${ns ? 'disabled' : ''}>${ns ? 'Choose a size to add' : (label || 'Add to bag')}</button>`;
@@ -204,7 +204,7 @@
       const d = byId[l.id], v = vOf(d, l.vkey), p = PK[l.product], pr = priceOf(l);
       const two = l.place === 'Both' || l.place === 'Two sides'; if (two) sides++;
       if (pr.num == null) open++; else total += pr.num;
-      return `<div class="bag-line"><span class="th" style="background:${G[l.color]}"><img src="${v.file}?r=${REL}" alt="${esc(d.name)}"></span><div><b>${esc(d.name)}${d.variants.length > 1 ? ' · ' + esc(v.label) : ''}</b><small>${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[l.place] || l.place.toLowerCase()} · ${l.color}${noSize(p) ? '' : ' · ' + l.size}</small></div><div><b>${pr.num == null ? '<span class="tbc">TBC</span>' : money(pr.num)}</b>${buyUrl(l) ? `<a class="rm buy" href="${buyUrl(l)}" target="_blank" rel="noopener">buy →</a>` : ''}<button class="rm" data-act="rm" data-pk="${pk}" data-i="${i}">remove</button></div></div>`;
+      return `<div class="bag-line"><span class="th" style="background:${G[l.color]}"><img src="${v.file}?r=${REL}" alt="${esc(d.name)}"></span><div><b>${esc(d.name)}${d.variants.length > 1 ? ' · ' + esc(v.label) : ''}</b><small>${p.label} · ${({ Front: 'front print', Back: 'back print', Both: 'front + back' })[l.place] || l.place.toLowerCase()} · ${l.color}${noSize(p) || !l.size ? '' : ' · ' + l.size}</small></div><div><b>${pr.num == null ? '<span class="tbc">TBC</span>' : money(pr.num)}</b>${buyUrl(l) ? `<a class="rm buy" href="${buyUrl(l)}" target="_blank" rel="noopener">buy →</a>` : ''}<button class="rm" data-act="rm" data-pk="${pk}" data-i="${i}">remove</button></div></div>`;
     }).join('');
     const tot = `<p><b>Together: ${money(total)}</b>${open ? ` · ${open} line${open > 1 ? 's' : ''} with a price to confirm` : ''} · free shipping for a limited time; hoodies, crewnecks and the full-zip add $2.50.</p>`;
     return `<div class="bag-lines">${lines}</div>${tot}`;
@@ -401,10 +401,19 @@
   const PAGE = 12;
   function band(n) { const b = BANDS[n]; if (!b) return ''; return `<div class="band c${b.length}">${b.map(([s, t, w, h, pos], i) => `<figure><div class="pw"><img class="px" src="${s}" alt="${esc(t)}" width="${w}" height="${h}" loading="eager" fetchpriority="high" decoding="async"></div></figure>`).join('')}<span class="cr">Photographs by Steve Davis</span></div>`; }
   function hubaTop(pk) {
-    return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark" href="#/p/huba/bag">Saved (${bagCount(pk)})</a></header>`;
+    return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark hs" href="#/p/huba/bag">${HEART}Saved (${bagCount(pk)})</a></header>`;
   }
   const preview = (d, eager) => { const v = d.variants[0]; return `<div class="artf pv" style="background:${v.garment}"><img src="prev/${v.key}-480.webp?r=${REL}" alt="${esc(d.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`; };
   function gridTile(d, eager) { return `<a class="gt" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}">${stacked(d, preview(d, eager))}<b>${esc(d.name)}${plusV(d)}</b></a>`; }
+  const HEART = '<svg class="hrt" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 20.4C8.4 17.8 4 14.6 4 10.8A4.2 4.2 0 0 1 12 8.6a4.2 4.2 0 0 1 8 2.2c0 3.8-4.4 7-8 9.6z"/></svg>';
+  const SAVED_KEY = 'btown.saved';
+  const persist = pk => { if (pk !== 'huba') return; try { localStorage.setItem(SAVED_KEY, JSON.stringify(S.huba.bag)); } catch (e) {} };
+  try {                                                     // restore, dropping anything whose design or product has since gone
+    const raw = localStorage.getItem(SAVED_KEY);
+    if (raw) S.huba.bag = (JSON.parse(raw) || []).filter(l => l && byId[l.id] && PK[l.product]);
+  } catch (e) {}
+  const savedIds = pk => new Set(S[pk].bag.map(l => l.id));
+  const isSaved = (pk, id) => S[pk].bag.some(l => l.id === id);
   const EXPAND = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 8.8 7.2M6.5 13.5h-4v-4M2.5 13.5 7.2 8.8"/></svg>';
   function tourPanel(pk) {
     const st = S[pk]; if (!st.tour) return '';
@@ -414,7 +423,7 @@
       <div class="tscroll" tabindex="-1" data-tscroll>${DES.map((d, i) => { const v = d.variants[0]; const r = ((v.w || 4) / (v.h || 3)).toFixed(4); const eager = Math.abs(i - at) < 2; const n = d.variants.length;
         const art = n > 1 ? `<div class="htrack" data-htrack tabindex="0" aria-roledescription="carousel" aria-label="${n} versions of ${esc(d.name)}. Swipe or use the arrows.">${d.variants.map((vv, k) => `<div class="hslide" role="group" aria-label="${k + 1} of ${n}: ${esc(vv.label)}">${artField(vv, vv.garment, '', d.name + ' · ' + vv.label, eager)}</div>`).join('')}</div><button class="harr l" data-act="hstep" data-dir="-1" aria-label="Previous version" hidden>‹</button><button class="harr r" data-act="hstep" data-dir="1" aria-label="Next version">›</button>` : artField(v, v.garment, '', d.name, eager);
         const cue = n > 1 ? `<div class="hcue"><span class="hdots" data-hdots>${d.variants.map((vv, k) => `<i${k === 0 ? ' class="on"' : ''}></i>`).join('')}</span><span class="hlab" data-hlab>‹ swipe for ${n} versions · ${esc(d.variants[0].label)} ›</span></div>` : '';
-        return `<section class="slide${n > 1 ? ' multi' : ''}" data-i="${i}"><div class="sart" style="--r:${r}">${art}</div>${cue}<div class="scap"><button class="tplay${st.tourAuto ? ' on' : ''}" data-act="tplay" data-pk="${pk}" aria-pressed="${st.tourAuto}" aria-label="${st.tourAuto ? 'Pause auto-advance' : 'Auto-advance every 7 seconds'}"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ring-bg" cx="32" cy="32" r="27"/><circle class="ring" cx="32" cy="32" r="27"/></svg><span class="tnum" aria-hidden="true"></span><span class="ic" aria-hidden="true"></span></button><button class="tpause" type="button" data-act="tplay" data-pk="${pk}">${st.tourAuto ? 'click to pause' : 'click to play'}</button><span class="nm">${esc(d.name)}</span><span class="pr">From $20</span>${d.front ? `<span class="fmock" title="The small front print, left chest" style="background:${v.garment}"><img src="${d.front.prev}?r=${REL}" alt="Front print for ${esc(d.name)}" loading="lazy" decoding="async"><i>front print</i></span>` : ''}<a class="go" href="#/p/huba/d/${d.id}">Choose product and size</a></div></section>`; }).join('')}</div></div></div>`;
+        return `<section class="slide${n > 1 ? ' multi' : ''}" data-i="${i}"><div class="sart" style="--r:${r}">${art}</div>${cue}<div class="scap"><button class="tplay${st.tourAuto ? ' on' : ''}" data-act="tplay" data-pk="${pk}" aria-pressed="${st.tourAuto}" aria-label="${st.tourAuto ? 'Pause auto-advance' : 'Auto-advance every 7 seconds'}"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ring-bg" cx="32" cy="32" r="27"/><circle class="ring" cx="32" cy="32" r="27"/></svg><span class="tnum" aria-hidden="true"></span><span class="ic" aria-hidden="true"></span></button><button class="tpause" type="button" data-act="tplay" data-pk="${pk}">${st.tourAuto ? 'click to pause' : 'click to play'}</button><span class="nm">${esc(d.name)}</span><span class="pr">From $20</span>${d.front ? `<button class="fmock" type="button" data-act="flb" data-pk="${pk}" data-id="${d.id}" title="See the front print at full size" aria-label="See the front print for ${esc(d.name)} at full size" style="background:${v.garment}"><img src="${d.front.prev}?r=${REL}" alt="Front print for ${esc(d.name)}" loading="lazy" decoding="async"><i>front print</i></button>` : ''}<a class="go" href="#/p/huba/d/${d.id}">Choose product and size</a><button class="fsave${isSaved(pk, d.id) ? ' on' : ''}" type="button" data-act="fsave" data-pk="${pk}" data-id="${d.id}" aria-pressed="${isSaved(pk, d.id)}">${HEART}<span>${isSaved(pk, d.id) ? 'Saved' : 'Save for later'}</span></button></div></section>`; }).join('')}</div></div></div>`;
   }
   function lightbox(pk) {
     const st = S[pk]; if (!st.lb) return ''; const d = byId[st.sel.id], v = vOf(d, st.sel.vkey), hex = G[st.sel.color];
@@ -427,7 +436,7 @@
     const st = S[pk]; const cur = Math.min(pages.length - 1, Math.max(0, st.page || 0));
     return `<div class="win"><div class="tb"><span class="dots pd">${pages.map((p, i) => `<button class="dot${i === cur ? ' on' : ''}" data-act="pageto" data-pk="${pk}" data-page="${i}" aria-label="Page ${i + 1}" aria-pressed="${i === cur}"></button>`).join('')}</span><span class="title">merch.exe</span><span class="cnt">Page ${cur + 1} of ${pages.length}</span></div>
       <div class="pager"><div class="track" data-pages style="transform:translateX(-${cur * 100}%)">${pages.map((p, i) => `<div class="page" data-page="${i + 1}" ${i === cur ? '' : 'aria-hidden="true"'}>${p.map(d => gridTile(d, i === 0)).join('')}</div>`).join('')}</div><button class="arr l" data-act="page" data-pk="${pk}" data-dir="-1" aria-label="Previous page" ${cur === 0 ? 'disabled' : ''}>‹</button><button class="arr r" data-act="page" data-pk="${pk}" data-dir="1" aria-label="Next page" ${cur >= pages.length - 1 ? 'disabled' : ''}>›</button></div>
-      <div class="status"><span>${DES.length} designs · ${pages.length} pages</span><span class="sr"><a href="#" data-act="random" data-pk="huba">Surprise me</a> · <a href="#/p/huba/bag">Saved (${bagCount(pk)})</a></span></div></div>`;
+      <div class="status"><span>${DES.length} designs · ${pages.length} pages</span><span class="sr"><a href="#" data-act="random" data-pk="huba">Surprise me</a> · <a class="hs" href="#/p/huba/bag">${HEART}Saved (${bagCount(pk)})</a></span></div></div>`;
   }
   // "(+2 versions)" after the name wherever a design has more than one
   const plusV = d => d.variants.length > 1 ? ` <span class="pv">(+${d.variants.length - 1} version${d.variants.length > 2 ? 's' : ''})</span>` : '';
@@ -461,7 +470,7 @@
         <div class="searchwrap"><label class="search"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input type="search" id="q" placeholder="Search ${DES.length} designs" aria-label="Search designs" autocomplete="off" spellcheck="false" value="${esc(st.q || '')}"><button type="button" class="qclear" data-act="qclear" data-pk="${pk}" aria-label="Clear search" ${st.q ? '' : 'hidden'}>×</button></label><span class="qhint" data-qhint></span></div>
         <section class="sec results" id="results" hidden><h2 class="D">Results</h2><p class="lede" data-qlede></p><div class="cards go now" id="resgrid"></div></section>
         <div class="tourwrap"><span class="arrs" aria-hidden="true"><i></i><i></i><i></i></span><button class="tour" type="button" data-act="tour" data-pk="${pk}"><span>Click to view each design 1 by 1 (it's a doozy)</span></button><span class="tourhint">Opens a scroller with one design per screen. Scroll or swipe to move through all ${DES.length}.</span><p class="jackson red"><b>Tees start at $20 shipped!</b><br>That’s a single Andrew Jackson<small>Free shipping is limited time, get it while it lasts</small></p></div>
-        ${secs}${about()}<footer class="foot"><span>Tees $20 · Premium $25 · Long sleeve $25 · Crop $30 · Crewneck $38 · Hoodie $45 · Full-zip $50 · Tote $22 · Stickers from $5 · Magnets from $12</span><span>Prototype. Checkout links come next.</span></footer>${tourPanel(pk)}</div>`;
+        ${secs}${about()}<footer class="foot"><span>Tees $20 · Premium $25 · Long sleeve $25 · Crop $30 · Crewneck $38 · Hoodie $45 · Full-zip $50 · Tote $22 · Stickers from $5 · Magnets from $12</span><span><b>Free shipping for a limited time.</b> Hoodies, crewnecks and the full-zip add $2.50.</span></footer>${tourPanel(pk)}${lightbox(pk)}</div>`;
     },
     detail(pk, d) {
       const copy = d.copy && d.copy.length ? d.copy.join(' / ') : 'No words';
@@ -581,7 +590,7 @@
       render.anchor[render.lastKey] = first ? { href: first.querySelector('.nm').getAttribute('href'), top: pageTop(first) - scrollNow() } : null;
     }
     stage.innerHTML = html;
-    try { document.documentElement.lang = 'en'; document.title = r.view === 'd' && byId[r.id] ? `${byId[r.id].name} · BTown Brief Merch` : r.view === 'bag' ? 'Cart · BTown Brief Merch' : 'BTown Brief Merch'; document.documentElement.style.setProperty('--sw', '0px'); } catch (e) {}
+    try { document.documentElement.lang = 'en'; document.title = r.view === 'd' && byId[r.id] ? `${byId[r.id].name} · BTown Brief Merch` : r.view === 'bag' ? 'Saved · BTown Brief Merch' : 'BTown Brief Merch'; document.documentElement.style.setProperty('--sw', '0px'); } catch (e) {}
     if (r.p === 'huba') { try { reveal(stage); parallax(); if (S.huba.q) applySearch(stage); } catch (e) {} }
     const BG = { hub: S.hub.night ? '#191a18' : '#faf9f5', awge: '#1a1a1a', oak: '#fff', hubo: '#faf9f5', huba: S.huba.night ? '#191a18' : '#faf9f5', oaka: '#fff', mix: '#faf9f5' };
     if (window.__tourStop) { window.__tourStop(); window.__tourStop = null; }
@@ -603,11 +612,11 @@
         timer = setTimeout(() => ts.scrollBy({ top: ts.clientHeight, behavior: smooth() }), TOUR_MS);
       };
       const nameEl = stage.querySelector('[data-tourname]');
-      const upd = () => { const i = idx(); if (i !== last) { last = i; cnt.textContent = `${i + 1} of ${DES.length}`; nameEl.textContent = DES[i].name; arm(); } };
+      const upd = () => { const i = idx(); if (i !== last) { last = i; st.tourAt = DES[i].id; cnt.textContent = `${i + 1} of ${DES.length}`; nameEl.textContent = DES[i].name; arm(); } };
       const pause = () => { if (!st.tourAuto) return; st.tourAuto = false; setBtn(); stop(); };
       ts.__toggle = () => { st.tourAuto = !st.tourAuto; setBtn(); arm(); };
       ts.__pause = pause;
-      ts.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest('.tplay, .tpause')) return; pause(); }); // a touch or swipe on the design pauses; the ring button toggles on its own
+      ts.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest('.tplay, .tpause, .fsave, .fmock')) return; pause(); }); // a touch or swipe on the design pauses; the ring button toggles on its own
       window.__tourStop = stop;
       ts.scrollTop = at * ts.clientHeight; upd(); ts.addEventListener('scroll', upd, { passive: true });
       setTimeout(() => ts.focus({ preventScroll: true }), 0);
@@ -683,7 +692,7 @@
     if (act === 'pick') { const st = S[pk]; const k = el.dataset.k, v = el.dataset.v; st.sel[k] = v; st.note = ''; st.noteKind = ''; ensureValid(st); render(); const f = document.querySelector(`[data-act="pick"][data-pk="${pk}"][data-k="${k}"][data-v="${v.replace(/"/g, '\\"')}"]`); if (f) f.focus({ preventScroll: true }); }
     else if (act === 'view') { S[pk].view = el.dataset.v; render(); }
     else if (act === 'night') { S[pk].night = !S[pk].night; render(); }
-    else if (act === 'add') { const st = S[pk]; if (needsSize(pk)) { st.note = 'Choose a size first.'; st.noteKind = 'warn'; render(); return; } st.bag.push(Object.assign({}, st.sel)); st.note = pk === 'huba' ? 'Saved for later.' : 'Added to your bag.'; st.noteKind = 'ok'; render(); }
+    else if (act === 'add') { const st = S[pk]; if (needsSize(pk)) { st.note = 'Choose a size first.'; st.noteKind = 'warn'; render(); return; } st.bag.push(Object.assign({}, st.sel)); persist(pk); st.note = pk === 'huba' ? 'Saved for later.' : 'Added to your bag.'; st.noteKind = 'ok'; render(); }
     else if (act === 'peek') { e.preventDefault(); S[pk].tour = true; S[pk].tourAt = +el.dataset.id; S[pk].tourAuto = false; render(); }
     else if (act === 'tour') { if (el.classList.contains('ov') && e.target !== el) return; S[pk].tour = !S[pk].tour; S[pk].tourAuto = S[pk].tour && !(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); if (!S[pk].tour) S[pk].tourAt = null; render(); }
     else if (act === 'hstep') { const tr = el.parentElement.querySelector('[data-htrack]'); tr.scrollBy({ left: (+el.dataset.dir) * tr.clientWidth, behavior: smooth() }); }
@@ -691,11 +700,26 @@
     else if (act === 'tstep') { const ts = document.querySelector('[data-tscroll]'); if (ts) ts.scrollBy({ top: (+el.dataset.dir) * ts.clientHeight, behavior: smooth() }); }
     else if (act === 'vstep') { const tr = el.closest('.vcar').querySelector('[data-vcar]'); tr.scrollBy({ left: (+el.dataset.dir) * tr.clientWidth, behavior: smooth() }); }
     else if (act === 'lbf') { S[pk].lb = 'front'; render(); }
+    else if (act === 'flb') { select(pk, +el.dataset.id); S[pk].lb = 'front'; render(); }   // the front print, full screen, from the feed
+    else if (act === 'fsave') {                                                              // save or unsave a design without leaving the page
+      const st = S[pk], id = +el.dataset.id, d = byId[id];
+      const was = isSaved(pk, id);
+      if (was) st.bag = st.bag.filter(l => l.id !== id);
+      else if (st.sel.id === id) st.bag.push(Object.assign({}, st.sel));
+      else { const v = d.variants[0], okc = suitFor(v, PK.tee), want = v.gname || gname(v.garment);
+             st.bag.push({ id, vkey: v.key, product: 'tee', place: 'Back', color: okc.includes(want) ? want : okc[0], size: null }); }
+      document.querySelectorAll(`[data-act="fsave"][data-id="${id}"]`).forEach(b => {
+        b.classList.toggle('on', !was); b.setAttribute('aria-pressed', String(!was));
+        const t = b.querySelector('span'); if (t) t.textContent = !was ? (b.classList.contains('save') ? 'Saved for later' : 'Saved') : 'Save for later';
+      });
+      document.querySelectorAll('.hs').forEach(a => { a.lastChild.textContent = `Saved (${st.bag.length})`; });
+      persist(pk);
+    }
     else if (act === 'lb') { if (el.classList.contains('ov') && e.target !== el) return; const tr = el.closest('[data-vcar]'); if (tr && tr.dataset.dragged) return; e.preventDefault(); S[pk].lb = !S[pk].lb; render(); }
     else if (act === 'random') { e.preventDefault(); const d = DES[Math.floor(Math.random() * DES.length)]; location.hash = `#/p/${pk}/d/${d.id}`; }
     else if (act === 'pageto') { S[pk].page = +el.dataset.page; render(); }
     else if (act === 'page') { const st = S[pk]; const n = Math.ceil(DES.length / PAGE); st.page = Math.min(n - 1, Math.max(0, (st.page || 0) + (+el.dataset.dir))); render(); }
-    else if (act === 'rm') { S[pk].bag.splice(+el.dataset.i, 1); render(); }
+    else if (act === 'rm') { S[pk].bag.splice(+el.dataset.i, 1); persist(pk); render(); }
     else if (act === 'qclear') { S.huba.q = ''; const q = document.getElementById('q'); if (q) { q.value = ''; q.focus(); } applySearch(document.getElementById('stage')); }
     else if (act === 'jump') { e.preventDefault(); const r = parse(); if (r.view !== 'home') { location.hash = `#/p/${r.p || 'hub'}/home`; setTimeout(() => { const t = document.getElementById(el.dataset.t); if (t) t.scrollIntoView({ behavior: smooth() }); }, 60); } else { const t = document.getElementById(el.dataset.t); if (t) t.scrollIntoView({ behavior: smooth() }); } }
   });
