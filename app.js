@@ -169,12 +169,13 @@
     // size
     rows.unshift(rows.pop());   // colour first, so the preview recolours before anything else is chosen (Stephen, 2026-09-19)
     if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''),
-      `${sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]}` : 'Standard price') : 'Choose a size'}<span class="steve">Personally, what fits me best is ordering one size up from my usual. I'd do the same if you have any doubt.</span>`));
+      (sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]}` : 'Standard price') : 'Choose a size'),
+      `<b>Sizing, from Steve:</b> what fits me best is ordering one size up from my usual. I'd do the same if you have any doubt.`));
     const note = st.note ? `<div class="lad-note ${st.noteKind || 'warn'}">${esc(st.note)}</div>` : '';
     return `<div class="lad">${note}${rows.join('')}</div>`;
   }
-  function row(label, opts, note) {
-    return `<div class="lad-row"><div class="lad-lab">${label}</div><div class="opts">${opts}</div>${note ? `<div class="lad-note">${note}</div>` : ''}</div>`;
+  function row(label, opts, note, lead) {
+    return `<div class="lad-row"><div class="lad-lab">${label}</div>${lead ? `<div class="lad-lead">${lead}</div>` : ''}<div class="opts">${opts}</div>${note ? `<div class="lad-note">${note}</div>` : ''}</div>`;
   }
   function opt(o) {
     return `<button class="opt ${o.cls || ''}${o.on ? ' on' : ''}${o.dis ? ' dis' : ''}" aria-pressed="${!!o.on}" ${o.dis ? 'disabled' : ''} title="${esc(o.title || '')}" data-act="pick" data-pk="${o.pk}" data-k="${o.k}" data-v="${esc(o.val)}"><span>${esc(o.label)}</span>${o.extra || ''}</button>`;
