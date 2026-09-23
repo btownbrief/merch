@@ -168,7 +168,8 @@
     else rows.push(row('Garment color', suitFor(v, prod).map(c => `<button class="opt sw${sel.color === c ? ' on' : ''}" aria-pressed="${sel.color === c}" style="background:${G[c]}" title="${c}" aria-label="${c}" data-act="pick" data-pk="${pk}" data-k="color" data-v="${c}"></button>`).join(''), (() => { const cs = (window.BTOWN_COLORS || {})[prod.key]; return cs && cs.length ? `${sel.color} shown · ${cs.length} colors at checkout: ${cs.join(', ')}` : `${sel.color} · every color the blank comes in is offered at checkout`; })()));
     // size
     rows.unshift(rows.pop());   // colour first, so the preview recolours before anything else is chosen (Stephen, 2026-09-19)
-    if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''), (sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]}` : 'Standard price') : 'Choose a size')));
+    if (!noSize(prod)) rows.push(row('Size', prod.sizes.map(s => opt({ pk, k: 'size', val: s, on: sel.size === s, label: s, cls: 'sz' })).join(''),
+      `${sel.size ? (prod.up && prod.up[sel.size] ? `${sel.size} adds $${prod.up[sel.size]}` : 'Standard price') : 'Choose a size'}<span class="steve">Personally, what fits me best is ordering one size up from my usual. I'd do the same if you have any doubt.</span>`));
     const note = st.note ? `<div class="lad-note ${st.noteKind || 'warn'}">${esc(st.note)}</div>` : '';
     return `<div class="lad">${note}${rows.join('')}</div>`;
   }
