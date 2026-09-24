@@ -330,6 +330,17 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 .p-huba .verbs a:hover{text-decoration:underline;text-underline-offset:5px}
 .p-huba .btn-dark{background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:4px;font-size:13px;font-weight:500;white-space:nowrap;flex:none}
 @media (max-width:900px){.p-huba .verbs{display:none}}
+/* nothing on the page may push it sideways; clip, unlike hidden, leaves the sticky header and the pop-ups alone */
+.p-huba{overflow-x:clip}
+/* phones: the header fits on one line, with Saved reduced to a heart and a count, pinned to the right */
+.p-huba .top .hs{margin-left:auto}
+@media (max-width:520px){
+  .p-huba .top{gap:10px;padding:0 16px}
+  .p-huba .mark{font-size:20px}
+  .p-huba .door{padding:6px 9px}
+  .p-huba .top .hs{padding:9px 12px}
+  .p-huba .top .hsl{display:none}
+}
 /* cover: the harbor photograph, the title, and the window on top of it */
 .p-huba .cover{position:relative;overflow:hidden;background:#556573;color:#faf9f5;display:grid;grid-template-columns:minmax(260px,.8fr) minmax(420px,1.2fr);gap:36px;align-items:center;padding:56px clamp(20px,5vw,80px) 64px}
 .p-huba .cover .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 58%;filter:saturate(.92);z-index:0;will-change:transform}
@@ -847,4 +858,4 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 <div id="stage"></div>
 <script src="buy.js?v=1789936421"></script>
 <script src="data.js?v=1790267572" charset="utf-8"></script>
-<script src="app.js?v=1790267572" charset="utf-8"></script>
+<script src="app.js?v=1790268287" charset="utf-8"></script>

@@ -403,7 +403,7 @@
   const PAGE = 12;
   function band(n) { const b = BANDS[n]; if (!b) return ''; return `<div class="band c${b.length}">${b.map(([s, t, w, h, pos], i) => `<figure><div class="pw"><img class="px" src="${s}" alt="${esc(t)}" width="${w}" height="${h}" loading="eager" fetchpriority="high" decoding="async"></div></figure>`).join('')}<span class="cr">Photographs by Steve Davis</span></div>`; }
   function hubaTop(pk) {
-    return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark hs" href="#/p/huba/bag">${HEART}Saved (${bagCount(pk)})</a></header>`;
+    return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark hs" href="#/p/huba/bag" aria-label="Saved for later">${HEART}<span class="hst"><span class="hsl">Saved (</span><span class="hsc">${bagCount(pk)}</span><span class="hsl">)</span></span></a></header>`;
   }
   const preview = (d, eager) => { const v = d.variants[0]; return `<div class="artf pv" style="background:${v.garment}"><img src="prev/${v.key}-480.webp?r=${REL}" alt="${esc(d.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`; };
   function gridTile(d, eager) { return `<div class="gt"><div class="tw${d.variants.length > 2 ? ' n3' : ''}"><a class="gta" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, eager))}<span class="ex">${EXPAND}</span></a>${tileBtns(d)}</div><a class="gtn" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}"><b>${esc(d.name)}${plusV(d)}</b></a></div>`; }
@@ -442,7 +442,7 @@
     const st = S[pk]; const cur = Math.min(pages.length - 1, Math.max(0, st.page || 0));
     return `<div class="win"><div class="tb"><span class="dots pd">${pages.map((p, i) => `<button class="dot${i === cur ? ' on' : ''}" data-act="pageto" data-pk="${pk}" data-page="${i}" aria-label="Page ${i + 1}" aria-pressed="${i === cur}"></button>`).join('')}</span><span class="title">merch.exe</span><span class="cnt">Page ${cur + 1} of ${pages.length}</span></div>
       <div class="pager"><div class="track" data-pages style="transform:translateX(-${cur * 100}%)">${pages.map((p, i) => `<div class="page" data-page="${i + 1}" ${i === cur ? '' : 'aria-hidden="true"'}>${p.map(d => gridTile(d, i === 0)).join('')}</div>`).join('')}</div><button class="arr l" data-act="page" data-pk="${pk}" data-dir="-1" aria-label="Previous page" ${cur === 0 ? 'disabled' : ''}>‹</button><button class="arr r" data-act="page" data-pk="${pk}" data-dir="1" aria-label="Next page" ${cur >= pages.length - 1 ? 'disabled' : ''}>›</button></div>
-      <div class="status"><span>${DES.length} designs · ${pages.length} pages</span><span class="sr"><a href="#" data-act="random" data-pk="huba">Surprise me</a> · <a class="hs" href="#/p/huba/bag">${HEART}Saved (${bagCount(pk)})</a></span></div></div>`;
+      <div class="status"><span>${DES.length} designs · ${pages.length} pages</span><span class="sr"><a href="#" data-act="random" data-pk="huba">Surprise me</a> · <a class="hs" href="#/p/huba/bag">${HEART}<span class="hst"><span class="hsl">Saved (</span><span class="hsc">${bagCount(pk)}</span><span class="hsl">)</span></span></a></span></div></div>`;
   }
   // "(+2 versions)" after the name wherever a design has more than one
   const plusV = d => d.variants.length > 1 ? ` <span class="pv">(+${d.variants.length - 1} version${d.variants.length > 2 ? 's' : ''})</span>` : '';
@@ -718,7 +718,7 @@
         b.classList.toggle('on', !was); b.setAttribute('aria-pressed', String(!was));
         const t = b.querySelector('span'); if (t) t.textContent = !was ? (b.classList.contains('save') ? 'Saved for later' : 'Saved') : 'Save for later';
       });
-      document.querySelectorAll('.hs').forEach(a => { a.lastChild.textContent = `Saved (${st.bag.length})`; });
+      document.querySelectorAll('.hs .hsc').forEach(c => { c.textContent = String(st.bag.length); });
       persist(pk);
     }
     else if (act === 'lb') { if (el.classList.contains('ov') && e.target !== el) return; const tr = el.closest('[data-vcar]'); if (tr && tr.dataset.dragged) return; e.preventDefault(); S[pk].lb = !S[pk].lb; render(); }
