@@ -347,6 +347,7 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 .p-huba .onwhat li{padding:1px 0;display:flex;align-items:baseline;gap:6px;list-style:none}
 .p-huba .onwhat li .ld{flex:1;min-width:14px;border-bottom:1px dotted rgba(250,249,245,.55);transform:translateY(-4px)}
 .p-huba .onwhat li i{font-style:normal;opacity:.85;white-space:nowrap}
+.p-huba .onwhat li b,.p-huba .onwhat li .tp{white-space:nowrap}
 .p-huba .onwhat li.wide,.p-huba .onwhat li.ship{display:block}
 .p-huba .onwhat li.ship{margin-bottom:4px;font-size:13px}
 .p-huba .onwhat li.ship b{color:#ffd9a8}
@@ -418,6 +419,28 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 .p-huba .ex{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:rgba(250,249,245,.28);color:rgba(20,20,19,.5);border:1px solid rgba(20,20,19,.08);display:flex;align-items:center;justify-content:center;pointer-events:none;transition:transform .15s ease,background .15s ease,color .15s ease}
 .p-huba .ex svg{width:8px;height:8px}
 .p-huba .qopen:hover .ex{transform:scale(1.1);background:rgba(250,249,245,.95);color:#141413}
+/* every tile: a heart to save it (top-left) and the front print (bottom-left), as small and quiet as the expand button */
+.p-huba .tw{position:relative}
+.p-huba .card .tw{align-self:stretch}
+.p-huba .gta{display:block;position:relative;border-radius:6px}
+.p-huba .gtn{display:block}
+.p-huba .thrt{position:absolute;top:8px;left:8px;z-index:4;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(250,249,245,.28);color:rgba(20,20,19,.5);border:1px solid rgba(20,20,19,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s ease,background .15s ease,color .15s ease}
+.p-huba .thrt .hrt{width:10px;height:10px}
+.p-huba .thrt:hover{transform:scale(1.12);background:rgba(250,249,245,.95);color:#141413}
+.p-huba .thrt.on{background:rgba(250,249,245,.92);color:#c8321b;border-color:rgba(200,50,27,.3)}
+.p-huba .tfp{position:absolute;left:8px;bottom:19px;z-index:4;width:26px;height:26px;padding:0;border-radius:5px;border:1px solid rgba(20,20,19,.14);box-shadow:0 3px 8px -3px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;cursor:zoom-in;opacity:.85;transition:transform .15s ease,opacity .15s ease}
+.p-huba .tfp img{max-width:80%;max-height:80%;object-fit:contain}
+.p-huba .tfp:hover{opacity:1;transform:scale(1.12)}
+.p-huba .card .tw.n3 .tfp{bottom:27px}
+.p-huba .gt .thrt{top:6px;left:6px}
+.p-huba .gt .tfp{left:6px;bottom:14px;width:22px;height:22px}
+.p-huba .gt .tw.n3 .tfp{bottom:19px}
+/* keep the tile lifted while the pointer is on its heart or front print */
+.p-huba .tw:hover .artf{transform:translateY(-3px);box-shadow:0 22px 34px -16px rgba(20,20,19,.5),0 4px 10px -3px rgba(20,20,19,.16)}
+/* product page: the same heart, a touch larger, in the design's top-left corner */
+.p-huba .vcar .thrt.vh{top:12px;left:12px;width:30px;height:30px;background:rgba(250,249,245,.72)}
+.p-huba .vcar .thrt.vh .hrt{width:15px;height:15px}
+@media (max-width:760px){.p-huba .card .tfp{bottom:15px;width:22px;height:22px}.p-huba .card .tw.n3 .tfp{bottom:20px}}
 .p-huba{--stackback:#d9d3c5;--red:#c8321b;--red2:#a3260f;--lift:0 14px 28px -14px rgba(20,20,19,.45),0 3px 8px -3px rgba(20,20,19,.18)}
 .p-huba.night{--stackback:#3b3e37;--lift:0 14px 28px -12px rgba(0,0,0,.8),0 3px 8px -3px rgba(0,0,0,.5)}
 .p-huba .pvw{display:block;position:relative}
@@ -655,7 +678,7 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 .p-huba .lbf figcaption em{color:#d9d6cc}
 .p-huba .lbf .x{position:absolute;right:12px;bottom:10px;border-color:rgba(250,249,245,.5);background:transparent;color:#faf9f5}
 .p-huba .zoom{display:block;width:100%;padding:0;border:0;background:none;position:relative;text-align:left;cursor:zoom-in;color:inherit}
-.p-huba .zoom .zh{position:absolute;right:10px;bottom:10px;font-size:11px;background:rgba(20,20,19,.65);color:#faf9f5;border-radius:999px;padding:4px 10px}
+.p-huba .zoom .zh{position:absolute;left:10px;bottom:10px;font-size:11px;background:rgba(20,20,19,.65);color:#faf9f5;border-radius:999px;padding:4px 10px}
 
 /* ======================================================================
    P6 · OAKLANDISH × AWGE  (white streetwear drop, pixel type, marquee)
@@ -823,5 +846,5 @@ body{background:#141413;color:#f3f0e8;font-family:Archivo,system-ui,sans-serif;f
 </style>
 <div id="stage"></div>
 <script src="buy.js?v=1789936421"></script>
-<script src="data.js?v=1789834824" charset="utf-8"></script>
-<script src="app.js?v=1790264155" charset="utf-8"></script>
+<script src="data.js?v=1790267572" charset="utf-8"></script>
+<script src="app.js?v=1790267572" charset="utf-8"></script>

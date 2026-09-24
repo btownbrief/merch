@@ -228,7 +228,8 @@
     const fr = d.front; const ar = aspect(v); const room = st.view === 'garment' || ar > 1.45 || ar < 0.8;
     const chip = fr ? `<button class="fchip${room ? '' : ' strip'}" type="button" data-act="lbf" data-pk="${pk}" style="background:${hex}" aria-label="See the front print at full size"><img src="${fr.prev}?r=${REL}" alt="Front print for ${esc(d.name)}"><span>front</span></button>` : '';
     const strip = fr && !room ? `<div class="pair">${chip}<span class="ptext"><b>Small front print</b> · about 3½ in wide on the left chest when you choose both sides · the main design goes on the back · front print only is the full design</span></div>` : '';
-    const body = multi ? `<div class="vcar"><div class="vtrack" tabindex="0" data-vcar aria-roledescription="carousel" aria-label="Versions of ${esc(d.name)}. Swipe, drag, or use the arrow keys.">${d.variants.map((vv, i) => `<div class="vslide" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${d.variants.length}: ${esc(vv.label)}">${one(vv)}</div>`).join('')}</div><button class="varr l" data-act="vstep" data-pk="${pk}" data-dir="-1" aria-label="Previous version"${vi === 0 ? ' hidden' : ''}>‹</button><button class="varr r" data-act="vstep" data-pk="${pk}" data-dir="1" aria-label="Next version"${vi === d.variants.length - 1 ? ' hidden' : ''}>›</button>${room ? chip : ''}</div><div class="vdots"><span role="tablist" aria-label="Versions">${d.variants.map((vv, i) => `<button role="tab" class="vdot${i === vi ? ' on' : ''}" aria-selected="${i === vi}" tabindex="${i === vi ? 0 : -1}" data-act="pick" data-pk="${pk}" data-k="vkey" data-v="${vv.key}" aria-label="Version ${i + 1}: ${esc(vv.label)}"></button>`).join('')}</span><span class="vlab" aria-live="polite">${esc(v.label)} · ${vi + 1} of ${d.variants.length}</span></div>` : `<div class="vcar solo">${one(v)}${room ? chip : ''}</div>`;
+    const vheart = `<button class="thrt vh${isSaved(pk, d.id) ? ' on' : ''}" type="button" data-act="fsave" data-pk="${pk}" data-id="${d.id}" aria-pressed="${isSaved(pk, d.id)}" aria-label="Save ${esc(d.name)} for later" title="Save for later">${HEART}</button>`;
+    const body = multi ? `<div class="vcar"><div class="vtrack" tabindex="0" data-vcar aria-roledescription="carousel" aria-label="Versions of ${esc(d.name)}. Swipe, drag, or use the arrow keys.">${d.variants.map((vv, i) => `<div class="vslide" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${d.variants.length}: ${esc(vv.label)}">${one(vv)}</div>`).join('')}</div><button class="varr l" data-act="vstep" data-pk="${pk}" data-dir="-1" aria-label="Previous version"${vi === 0 ? ' hidden' : ''}>‹</button><button class="varr r" data-act="vstep" data-pk="${pk}" data-dir="1" aria-label="Next version"${vi === d.variants.length - 1 ? ' hidden' : ''}>›</button>${room ? chip : ''}${vheart}</div><div class="vdots"><span role="tablist" aria-label="Versions">${d.variants.map((vv, i) => `<button role="tab" class="vdot${i === vi ? ' on' : ''}" aria-selected="${i === vi}" tabindex="${i === vi ? 0 : -1}" data-act="pick" data-pk="${pk}" data-k="vkey" data-v="${vv.key}" aria-label="Version ${i + 1}: ${esc(vv.label)}"></button>`).join('')}</span><span class="vlab" aria-live="polite">${esc(v.label)} · ${vi + 1} of ${d.variants.length}</span></div>` : `<div class="vcar solo">${one(v)}${room ? chip : ''}${vheart}</div>`;
     const chest = fr && frontHere(p, sel.place);
     const cap = st.view === 'art' ? `Shown on ${sel.color}`
       : sel.place === 'Both' ? `${p.label} · small front print on the left chest, full design on the back`
@@ -405,7 +406,7 @@
     return `<header class="top"><a class="mark" href="#/p/huba/home">BTown <i>Brief</i></a><div class="doors"><span class="door cur">MERCH</span><a class="door" href="https://hub.btownbrief.com/" target="_blank" rel="noopener">CITY HUB</a></div><nav class="verbs">${SECTIONS.slice(0, 5).map(s => `<a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a>`).join('')}</nav><a class="btn-dark hs" href="#/p/huba/bag">${HEART}Saved (${bagCount(pk)})</a></header>`;
   }
   const preview = (d, eager) => { const v = d.variants[0]; return `<div class="artf pv" style="background:${v.garment}"><img src="prev/${v.key}-480.webp?r=${REL}" alt="${esc(d.name)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`; };
-  function gridTile(d, eager) { return `<a class="gt" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}">${stacked(d, preview(d, eager))}<b>${esc(d.name)}${plusV(d)}</b></a>`; }
+  function gridTile(d, eager) { return `<div class="gt"><div class="tw${d.variants.length > 2 ? ' n3' : ''}"><a class="gta" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, eager))}<span class="ex">${EXPAND}</span></a>${tileBtns(d)}</div><a class="gtn" href="#/p/huba/d/${d.id}" data-act="peek" data-pk="huba" data-id="${d.id}"><b>${esc(d.name)}${plusV(d)}</b></a></div>`; }
   const HEART = '<svg class="hrt" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 20.4C8.4 17.8 4 14.6 4 10.8A4.2 4.2 0 0 1 12 8.6a4.2 4.2 0 0 1 8 2.2c0 3.8-4.4 7-8 9.6z"/></svg>';
   const SAVED_KEY = 'btown.saved';
   const persist = pk => { if (pk !== 'huba') return; try { localStorage.setItem(SAVED_KEY, JSON.stringify(S.huba.bag)); } catch (e) {} };
@@ -415,6 +416,10 @@
   } catch (e) {}
   const savedIds = pk => new Set(S[pk].bag.map(l => l.id));
   const isSaved = (pk, id) => S[pk].bag.some(l => l.id === id);
+  // small, quiet controls laid over a tile: save it (top-left) and see its front print (bottom-left)
+  const tileBtns = d => { const sv = isSaved('huba', d.id);
+    return `<button class="thrt${sv ? ' on' : ''}" type="button" data-act="fsave" data-pk="huba" data-id="${d.id}" aria-pressed="${sv}" aria-label="Save ${esc(d.name)} for later" title="Save for later">${HEART}</button>`
+      + (d.front ? `<button class="tfp" type="button" data-act="flb" data-pk="huba" data-id="${d.id}" aria-label="See the front print for ${esc(d.name)}" title="See the front print" style="background:${d.variants[0].garment}"><img src="${d.front.prev}?r=${REL}" alt="" loading="lazy" decoding="async"></button>` : ''); };
   const EXPAND = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 8.8 7.2M6.5 13.5h-4v-4M2.5 13.5 7.2 8.8"/></svg>';
   function tourPanel(pk) {
     const st = S[pk]; if (!st.tour) return '';
@@ -444,11 +449,11 @@
   // a design with more versions shows them as cards stacked behind the tile, in their own garment colors
   // every tile sits on a backing card; a design with more versions gets a red one (and a third card when there are three)
   const stacked = (d, inner) => `<span class="pvw stack${d.variants.length > 1 ? ' multi' : ''}${d.variants.length > 2 ? ' n3' : ''}">${inner}</span>`;
-  function card(d, i) { return `<div class="card" style="--d:${120 + i * 40}ms"><button class="qopen" type="button" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, i < 4))}<span class="ex">${EXPAND}</span></button><a class="nm" href="#/p/huba/d/${d.id}">${esc(d.name)}${plusV(d)}</a><span class="fr">From $20</span></div>`; }
+  function card(d, i) { return `<div class="card" style="--d:${120 + i * 40}ms"><div class="tw${d.variants.length > 2 ? ' n3' : ''}"><button class="qopen" type="button" data-act="peek" data-pk="huba" data-id="${d.id}" aria-label="Quick view: ${esc(d.name)}">${stacked(d, preview(d, i < 4))}<span class="ex">${EXPAND}</span></button>${tileBtns(d)}</div><a class="nm" href="#/p/huba/d/${d.id}">${esc(d.name)}${plusV(d)}</a><span class="fr">From $20</span></div>`; }
   // product tiers: facts come from the product data; blank names for the two tees come from the brief
   const TIER = {
     tee: { price: '$20' }, premium: { price: '$25' }, ls: { price: '$25' }, lspremium: { price: '$40' }, crop: { price: '$30' }, crew: { price: '$38' }, crewpremium: { price: '$52' },
-    hoodie: { price: '$45' }, hoodiepremium: { price: '$55' }, zip: { price: '$50' }, tote: { price: '$22 · both sides $28' }, sticker: { price: 'from $5' }, magnet: { price: 'from $12' },
+    hoodie: { price: '$45' }, hoodiepremium: { price: '$55' }, zip: { price: '$50' }, tote: { price: 'from $22' }, sticker: { price: 'from $5' }, magnet: { price: 'from $12' },
   };
   function about() {
     const ab = DATA.about || {}; if (!ab.text) return '';
@@ -462,7 +467,7 @@
         <section class="cover"><img class="photo px" src="img/harbor.jpg?v=4" fetchpriority="high" decoding="async" alt="Burlington Harbor from above at dusk">
           <div class="ct"><div class="eyebrow">Burlington, Vermont</div><h1 class="D">Things to wear<br>for Burlington</h1><p class="jackson"><b>Tees start at $20 shipped!</b><br>That’s a single Andrew Jackson</p>
             <ol class="toc">${SECTIONS.map(s => `<li><span class="n">[${s.n}]</span><span class="ld"></span><a href="#/p/huba/home" data-act="jump" data-t="h${s.n}">${esc(s.t)}</a></li>`).join('')}</ol>
-            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time · hoodies, crewnecks and the full-zip add $2.50</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b> ${TIER[p.key].price}<span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8</li></ul>
+            <ul class="onwhat"><li class="ship"><b>Free shipping</b> for a limited time · hoodies, crewnecks and the full-zip add $2.50</li>${PR.filter(p => TIER[p.key]).map(p => `<li><b>${esc(p.label)}</b><span class="tp">${TIER[p.key].price}</span><span class="ld"></span><i>${esc(p.blank)}</i></li>`).join('')}<li class="wide"><b>Front, back, or both</b> on every shirt · both +$8</li></ul>
             <p class="onwhat-links"><a href="#/p/huba/home" data-act="jump" data-t="about">About the maker ↓</a></p></div>
           ${gridWin(pk)}
           ${nightPill(pk)}
